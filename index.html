@@ -452,8 +452,7 @@
 
   <script>
     // =====================
-    // FLAGS
-    // =====================
+    // FLAG    // =====================
     const ENABLE_FORM = true;
     const ENABLE_BANNER = true;
     const NEWS_BANNER_TEXT = " جاري تحديث البيانات";
@@ -467,18 +466,15 @@
     // Power Automate Flow endpoint (كما هو)
     const FLOW_ENDPOINT = 'https://defaultde8d64b779da419880c27b84343483.4f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4255a7e944c347adac8f2230e02bc510/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aeXEH2HrjtWGyc_hNgpP-iyFz3nrh4GiSVz2W0qmf6Y';
 
-    // Polling backoff
-    const POLL_BASE = 2000;
+    // Polling backof    const POLL_BASE = 2000;
     const POLL_MAX  = 9000;
 
-    // GPS location list (CSV) كما هو
-    const LOCATION_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2cFw2_Jrr1j-Iy48e2BREiBlJ9Bj5vMTh3tl72YtTcnJ2DOXUDrD9I5SeVH0WSHeg9ec_tzXDZgEN/pub?output=csv';
+    // GPS location list (CSV) كما ه    const LOCATION_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2cFw2_Jrr1j-Iy48e2BREiBlJ9Bj5vMTh3tl72YtTcnJ2DOXUDrD9I5SeVH0WSHeg9ec_tzXDZgEN/pub?output=csv';
     const RADIUS_KM = 99999999; //0.2;
 
     let locationData = null;
 
-    // normalize Arabic digits
-    function normalizeDigits(s) {
+    // normalize Arabic digit    function normalizeDigits(s) {
       const map = {
         '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
         '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'
@@ -487,22 +483,19 @@
     }
 
     document.addEventListener("DOMContentLoaded", async function() {
-      // banner
-      const banner = document.getElementById('newsBanner');
+      // banne      const banner = document.getElementById('newsBanner');
       if (!ENABLE_BANNER) banner.style.display = "none";
       else {
         banner.style.display = "block";
         banner.querySelector('p').textContent = NEWS_BANNER_TEXT;
       }
 
-      // maintenance
-      if (!ENABLE_FORM) {
+      // maintenanc      if (!ENABLE_FORM) {
         document.getElementById('reportForm').style.display = "none";
         document.getElementById('formDisabledMessage').style.display = "block";
       }
 
-      // preload location data
-      try {
+      // preload location dat      try {
         const response = await fetch(LOCATION_SHEET_URL);
         if (!response.ok) throw new Error('Network response for location data was not ok');
         const csvText = await response.text();
@@ -515,8 +508,7 @@
         }
       }
 
-      // prefill
-      try {
+      // prefil      try {
         const params = new URLSearchParams(location.search);
         const noSubmit = params.has('nosubmit');
 
@@ -533,8 +525,7 @@
             AUTO_SUBMIT_ON_PREFILL &&
             !noSubmit &&
             ENABLE_FORM &&
-            !document.getElementById('submitBtn').disabled
-          ) {
+            !document.getElementById('submitBtn').disable          ) {
             setTimeout(() => {
               const formEl = document.getElementById('reportForm');
               if (formEl.requestSubmit) formEl.requestSubmit();
@@ -588,12 +579,10 @@
         <div class="grid">
           <div class="field">
             <label for="studentId">
-              رقم المتدرب
-              <span>9 أرقام يبدأ بـ 4</span>
+              رقم المتدر              <span>9 أرقام يبدأ بـ 4</span>
             </label>
             <div class="input-wrap">
-              <input type="text" id="studentId" name="studentId" required
-                pattern="4\d{8}" inputmode="numeric"
+              <input type="text" id="studentId" name="studentId" require                pattern="4\d{8}" inputmode="numeric"
                 placeholder="مثال: 4xxxxxxxx" autocomplete="off">
               <button class="clear-btn" type="button" id="clearBtn1" aria-label="مسح">✕</button>
             </div>
@@ -602,12 +591,10 @@
 
           <div class="field">
             <label for="last4">
-              آخر 4 أرقام من الجوال
-              <span>4 أرقام فقط</span>
+              آخر 4 أرقام من الجوا              <span>4 أرقام فقط</span>
             </label>
             <div class="input-wrap">
-              <input type="text" id="last4" name="last4" required
-                pattern="\d{4}" inputmode="numeric"
+              <input type="text" id="last4" name="last4" require                pattern="\d{4}" inputmode="numeric"
                 placeholder="مثال: 1234" autocomplete="off">
               <button class="clear-btn" type="button" id="clearBtn2" aria-label="مسح">✕</button>
             </div>
@@ -663,8 +650,7 @@
     // ===== Floating background =====
     const emojiContainer = document.getElementById('emojiContainer');
     const emojis = ['📚', '🎓', '📝', '📖', '✏️', '🏫'];
-    const customLogoUrl = "https://i.postimg.cc/jSwbLwry/Asset-18.jpg"; // ✅ نفس صورة اللوقو
-
+    const customLogoUrl = "https://i.postimg.cc/jSwbLwry/Asset-18.jpg"; // ✅ نفس صورة اللوق
     function createFloatingItem() {
       const floatingItem = document.createElement('div');
       floatingItem.className = 'emoji-scroll';
@@ -730,6 +716,5 @@
       hideFieldError(fieldError2);
     });
 
-    function setButtonLoading
-
+    function setButtonLoadin
 
