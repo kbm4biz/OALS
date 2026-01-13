@@ -462,7 +462,7 @@
     const PREFILL_KEYS = ["studentId", "id"];
 
     // ✅ جديد: تفعيل/تعطيل التحقق بالموقع
-    const ENABLE_GPS_VERIFY = false; // true = مفعل | false = غير مفعل
+    const ENABLE_GPS_VERIFY = true; // true = مفعل | false = غير مفعل
 
     // ✅ ضع هنا رابط Apps Script Web App (/exec)
     const VALIDATION_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbypVeYVhvsi_O91QbTB782mGfrbyvi_8qoF6B94H3nxZVtBtkBcflfbPr6KSFwk640tBg/exec";
@@ -476,7 +476,7 @@
 
     // GPS location list (CSV) كما هو
     const LOCATION_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2cFw2_Jrr1j-Iy48e2BREiBlJ9Bj5vMTh3tl72YtTcnJ2DOXUDrD9I5SeVH0WSHeg9ec_tzXDZgEN/pub?output=csv';
-    const RADIUS_KM = 99999999; //0.2;
+    const RADIUS_KM = 0.2; //0.2;
 
     let locationData = null;
 
@@ -1155,3 +1155,4 @@
   </script>
 </body>
 </html>
+
