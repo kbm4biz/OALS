@@ -557,7 +557,82 @@
       } catch (e) {
         console.warn("Prefill error:", e);
       }
+
+      // ✅ NEW: load total downloads at startup
+      fetchTotalDownloads();
     });
+
+    // ===== JSONP helper (CORS-safe) =====
+    function jsonp(url, timeoutMs = 8000){
+      return new Promise((resolve, reject) => {
+        const cb = `cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+        const script = document.createElement('script');
+
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error('انتهت مهلة التحقق (timeout).'));
+        }, timeoutMs);
+
+        function cleanup(){
+          clearTimeout(timer);
+          delete window[cb];
+          script.remove();
+        }
+
+        window[cb] = (data) => {
+          cleanup();
+          resolve(data);
+        };
+
+        const sep = url.includes('?') ? '&' : '?';
+        script.src = `${url}${sep}callback=${encodeURIComponent(cb)}`;
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('تعذر الاتصال بخدمة التحقق.'));
+        };
+
+        document.body.appendChild(script);
+      });
+    }
+
+    // ✅ NEW: totals + increment helpers (Apps Script)
+    async function fetchTotalDownloads(){
+      const el = document.getElementById('totalDownloads');
+      if (el) el.textContent = 'إجمالي التحميلات: ...';
+
+      if (!VALIDATION_WEBAPP_URL) return;
+
+      try{
+        const res = await jsonp(`${VALIDATION_WEBAPP_URL}?action=totals`, 8000);
+        if (res && res.ok === true) {
+          const total = (typeof res.total === 'number') ? res.total : (parseInt(String(res.total || '0'), 10) || 0);
+          if (el) el.textContent = `إجمالي التحميلات: ${total}`;
+        } else {
+          if (el) el.textContent = 'إجمالي التحميلات: -';
+        }
+      }catch(e){
+        console.warn('fetchTotalDownloads failed:', e);
+        if (el) el.textContent = 'إجمالي التحميلات: -';
+      }
+    }
+
+    async function incrementDownloadCount(studentId, last4){
+      if (!VALIDATION_WEBAPP_URL) return;
+
+      try{
+        const url = `${VALIDATION_WEBAPP_URL}?action=inc&studentId=${encodeURIComponent(studentId)}&last4=${encodeURIComponent(last4)}`;
+        const res = await jsonp(url, 8000);
+        if (res && res.ok === true) {
+          const totalEl = document.getElementById('totalDownloads');
+          if (totalEl) {
+            const total = (typeof res.total === 'number') ? res.total : (parseInt(String(res.total || '0'), 10) || 0);
+            totalEl.textContent = `إجمالي التحميلات: ${total}`;
+          }
+        }
+      }catch(e){
+        console.warn('incrementDownloadCount failed:', e);
+      }
+    }
   </script>
 </head>
 
@@ -581,6 +656,8 @@
 
         <div class="hero-meta">
           <div class="pill">🕒 <small id="timestamp"></small></div>
+          <!-- ✅ NEW -->
+          <div class="pill">📥 <small id="totalDownloads">إجمالي التحميلات: ...</small></div>
           <div class="pill">📍 <small id="gpsPillText">...</small></div>
         </div>
       </div>
@@ -671,6 +748,9 @@
 
     const clearBtn1 = document.getElementById('clearBtn1');
     const clearBtn2 = document.getElementById('clearBtn2');
+
+    // Keep last submit for increment
+    window.__lastSubmit = null;
 
     // ===== Floating background =====
     const emojiContainer = document.getElementById('emojiContainer');
@@ -778,39 +858,6 @@
         </div>
       `;
       updateStatus('جاهز', 'success');
-    }
-
-    // ===== JSONP helper (CORS-safe) =====
-    function jsonp(url, timeoutMs = 8000){
-      return new Promise((resolve, reject) => {
-        const cb = `cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
-        const script = document.createElement('script');
-
-        const timer = setTimeout(() => {
-          cleanup();
-          reject(new Error('انتهت مهلة التحقق (timeout).'));
-        }, timeoutMs);
-
-        function cleanup(){
-          clearTimeout(timer);
-          delete window[cb];
-          script.remove();
-        }
-
-        window[cb] = (data) => {
-          cleanup();
-          resolve(data);
-        };
-
-        const sep = url.includes('?') ? '&' : '?';
-        script.src = `${url}${sep}callback=${encodeURIComponent(cb)}`;
-        script.onerror = () => {
-          cleanup();
-          reject(new Error('تعذر الاتصال بخدمة التحقق.'));
-        };
-
-        document.body.appendChild(script);
-      });
     }
 
     // ===== Validation via Apps Script WebApp =====
@@ -990,14 +1037,28 @@
             const finalUrl = data?.output?.reportUrl || data?.properties?.outputs?.reportUrl;
             if (finalUrl) {
               progress.complete();
-              return showReportLink(finalUrl);
+              showReportLink(finalUrl);
+
+              // ✅ NEW: increment count after success
+              if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
+                incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+              }
+
+              return;
             }
             throw new Error('الرابط غير موجود في الاستجابة النهائية');
           }
 
           if (data.reportUrl) {
             progress.complete();
-            return showReportLink(data.reportUrl);
+            showReportLink(data.reportUrl);
+
+            // ✅ NEW: increment count after success
+            if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
+              incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+            }
+
+            return;
           }
 
           if (data.status === 'Failed') {
@@ -1034,6 +1095,9 @@
       if (!cleaned4) return showFieldError(fieldError2, 'فضلاً أدخل آخر 4 أرقام من الجوال');
       if (!/^\d{4}$/.test(cleaned4)) return showFieldError(fieldError2, 'آخر 4 أرقام يجب أن تكون 4 أرقام فقط');
 
+      // ✅ keep last submit for increment later
+      window.__lastSubmit = { studentId: cleanedId, last4: cleaned4 };
+
       setButtonLoading(true);
       startEmojiAnimation();
       resetUI();
@@ -1043,7 +1107,7 @@
         updateStatus('جاري التحقق من رقم المتدرب وبيانات الجوال...', 'warning');
         await validateStudent(cleanedId, cleaned4);
 
-        // ✅ جديد: تفعيل/تعطيل GPS من خلال Flag
+        // ✅ GPS flag
         if (ENABLE_GPS_VERIFY) {
           updateStatus('جاري التحقق من الموقع الجغرافي... يرجى السماح بالوصول لموقعك.', 'warning');
           await performGpsCheck();
@@ -1068,8 +1132,16 @@
           await pollReportStatus(statusUrl);
         } else if (response.ok) {
           const data = await response.json();
-          if (data.reportUrl) showReportLink(data.reportUrl);
-          else throw new Error('لا يوجد رابط الملخص في الاستجابة');
+          if (data.reportUrl) {
+            showReportLink(data.reportUrl);
+
+            // ✅ NEW: increment count after success
+            if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
+              incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+            }
+          } else {
+            throw new Error('لا يوجد رابط الملخص في الاستجابة');
+          }
         } else {
           throw new Error(`خطأ HTTP! الحالة: ${response.status}`);
         }
@@ -1083,5 +1155,3 @@
   </script>
 </body>
 </html>
-
-
