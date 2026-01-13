@@ -461,6 +461,9 @@
     const AUTO_SUBMIT_ON_PREFILL = true;
     const PREFILL_KEYS = ["studentId", "id"];
 
+    // ✅ جديد: تفعيل/تعطيل التحقق بالموقع
+    const ENABLE_GPS_VERIFY = true; // true = مفعل | false = غير مفعل
+
     // ✅ ضع هنا رابط Apps Script Web App (/exec)
     const VALIDATION_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbypVeYVhvsi_O91QbTB782mGfrbyvi_8qoF6B94H3nxZVtBtkBcflfbPr6KSFwk640tBg/exec";
 
@@ -501,18 +504,27 @@
         document.getElementById('formDisabledMessage').style.display = "block";
       }
 
-      // preload location data
-      try {
-        const response = await fetch(LOCATION_SHEET_URL);
-        if (!response.ok) throw new Error('Network response for location data was not ok');
-        const csvText = await response.text();
-        locationData = processLocationCSV(csvText);
-      } catch (error) {
-        console.error('Failed to load location data:', error);
-        if (ENABLE_FORM) {
-          document.getElementById('submitBtn').disabled = true;
-          showError('فشل تحميل بيانات الموقع. لا يمكن المتابعة.');
+      // GPS pill text (new)
+      const gpsPill = document.getElementById('gpsPillText');
+      if (gpsPill) gpsPill.textContent = ENABLE_GPS_VERIFY ? 'تحقق الموقع مفعل' : 'تحقق الموقع غير مفعل';
+
+      // preload location data (only if GPS enabled)
+      if (ENABLE_GPS_VERIFY) {
+        try {
+          const response = await fetch(LOCATION_SHEET_URL);
+          if (!response.ok) throw new Error('Network response for location data was not ok');
+          const csvText = await response.text();
+          locationData = processLocationCSV(csvText);
+        } catch (error) {
+          console.error('Failed to load location data:', error);
+          if (ENABLE_FORM) {
+            document.getElementById('submitBtn').disabled = true;
+            showError('فشل تحميل بيانات الموقع. لا يمكن المتابعة لأن التحقق بالموقع مفعل.');
+          }
         }
+      } else {
+        // GPS disabled: do not load locations and do not block the form
+        locationData = null;
       }
 
       // prefill
@@ -569,7 +581,7 @@
 
         <div class="hero-meta">
           <div class="pill">🕒 <small id="timestamp"></small></div>
-          <div class="pill">📍 <small>تحقق الموقع مفعل</small></div>
+          <div class="pill">📍 <small id="gpsPillText">...</small></div>
         </div>
       </div>
 
@@ -1031,9 +1043,14 @@
         updateStatus('جاري التحقق من رقم المتدرب وبيانات الجوال...', 'warning');
         await validateStudent(cleanedId, cleaned4);
 
-        updateStatus('جاري التحقق من الموقع الجغرافي... يرجى السماح بالوصول لموقعك.', 'warning');
-        await performGpsCheck();
-        updateStatus('تم التحقق من الموقع بنجاح ✅', 'success');
+        // ✅ جديد: تفعيل/تعطيل GPS من خلال Flag
+        if (ENABLE_GPS_VERIFY) {
+          updateStatus('جاري التحقق من الموقع الجغرافي... يرجى السماح بالوصول لموقعك.', 'warning');
+          await performGpsCheck();
+          updateStatus('تم التحقق من الموقع بنجاح ✅', 'success');
+        } else {
+          updateStatus('تم تجاوز التحقق من الموقع (GPS غير مفعل).', 'warning');
+        }
 
         const response = await fetch(FLOW_ENDPOINT, {
           method: 'POST',
@@ -1066,4 +1083,3 @@
   </script>
 </body>
 </html>
-
