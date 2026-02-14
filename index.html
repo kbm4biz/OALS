@@ -457,7 +457,7 @@
     // =====================
     const ENABLE_FORM = true;
     const ENABLE_BANNER = true;
-    const NEWS_BANNER_TEXT = "السبت 24-01-2026 22:18 تم تحديث البيانات للفصل الثاني-";
+    const NEWS_BANNER_FALLBACK = "";
 
     const AUTO_SUBMIT_ON_PREFILL = true;
     const PREFILL_KEYS = ["studentId", "id"];
@@ -496,7 +496,8 @@
       if (!ENABLE_BANNER) banner.style.display = "none";
       else {
         banner.style.display = "block";
-        banner.querySelector('p').textContent = NEWS_BANNER_TEXT;
+        banner.querySelector('p').textContent = NEWS_BANNER_FALLBACK || '...';
+        await fetchNewsBannerText();
       }
 
       // maintenance
@@ -597,6 +598,29 @@
     }
 
     // ✅ NEW: totals + increment helpers (Apps Script)
+    async function fetchNewsBannerText(){
+      const banner = document.getElementById('newsBanner');
+      if (!banner || !VALIDATION_WEBAPP_URL) return;
+
+      try{
+        const res = await jsonp(`${VALIDATION_WEBAPP_URL}?action=news`, 8000);
+        if (res && res.ok === true && String(res.text || '').trim()) {
+          banner.querySelector('p').textContent = String(res.text).trim();
+        } else if (NEWS_BANNER_FALLBACK) {
+          banner.querySelector('p').textContent = NEWS_BANNER_FALLBACK;
+        } else {
+          banner.style.display = 'none';
+        }
+      }catch(e){
+        console.warn('fetchNewsBannerText failed:', e);
+        if (NEWS_BANNER_FALLBACK) {
+          banner.querySelector('p').textContent = NEWS_BANNER_FALLBACK;
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+    }
+
     async function fetchTotalDownloads(){
       const el = document.getElementById('totalDownloads');
       if (el) el.textContent = 'إجمالي التحميلات: ...';
@@ -617,11 +641,13 @@
       }
     }
 
-    async function incrementDownloadCount(studentId, last4){
+    async function incrementDownloadCount(studentId){
       if (!VALIDATION_WEBAPP_URL) return;
 
       try{
-        const url = `${VALIDATION_WEBAPP_URL}?action=inc&studentId=${encodeURIComponent(studentId)}&last4=${encodeURIComponent(last4)}`;
+        const ts = new Date().toISOString();
+        // Backend should append into logs sheet: A=id, B=timestamp
+        const url = `${VALIDATION_WEBAPP_URL}?action=inc&studentId=${encodeURIComponent(studentId)}&ts=${encodeURIComponent(ts)}`;
         const res = await jsonp(url, 8000);
         if (res && res.ok === true) {
           const totalEl = document.getElementById('totalDownloads');
@@ -1041,8 +1067,8 @@
               showReportLink(finalUrl);
 
               // ✅ NEW: increment count after success
-              if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
-                incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+              if (window.__lastSubmit?.studentId) {
+                incrementDownloadCount(window.__lastSubmit.studentId);
               }
 
               return;
@@ -1055,8 +1081,8 @@
             showReportLink(data.reportUrl);
 
             // ✅ NEW: increment count after success
-            if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
-              incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+            if (window.__lastSubmit?.studentId) {
+              incrementDownloadCount(window.__lastSubmit.studentId);
             }
 
             return;
@@ -1137,8 +1163,8 @@
             showReportLink(data.reportUrl);
 
             // ✅ NEW: increment count after success
-            if (window.__lastSubmit?.studentId && window.__lastSubmit?.last4) {
-              incrementDownloadCount(window.__lastSubmit.studentId, window.__lastSubmit.last4);
+            if (window.__lastSubmit?.studentId) {
+              incrementDownloadCount(window.__lastSubmit.studentId);
             }
           } else {
             throw new Error('لا يوجد رابط الملخص في الاستجابة');
