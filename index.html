@@ -488,12 +488,47 @@
       try { return JSON.parse(text); } catch { return text; }
     }
 
-    async function pollFlow(statusUrl, service) {
+    async function pollFlow(statusUrl, service, initialDelayMs = 0) {
       const startedAt = Date.now();
       let delay = POLL_BASE;
+      let transientFailures = 0;
+
+      if (initialDelayMs > 0) {
+        await new Promise(resolve => window.setTimeout(resolve, Math.min(initialDelayMs, 30000)));
+      }
+
       while (Date.now() - startedAt < POLL_TIMEOUT) {
-        const response = await fetch(statusUrl);
-        if (!response.ok) throw new Error(`تعذر قراءة حالة التدفق (${response.status}).`);
+        let response;
+        try {
+          response = await fetch(statusUrl);
+        } catch (error) {
+          transientFailures += 1;
+          if (transientFailures > 5) throw new Error("انقطع الاتصال بخدمة التدفق بعد عدة محاولات.");
+          await new Promise(resolve => window.setTimeout(resolve, delay));
+          delay = Math.min(POLL_MAX, Math.floor(delay * 1.5));
+          continue;
+        }
+
+        const retryableStatuses = [408, 425, 429, 500, 502, 503, 504];
+        if (retryableStatuses.includes(response.status)) {
+          transientFailures += 1;
+          if (transientFailures > 5) {
+            const failureBody = await readFlowResponse(response);
+            throw new Error(failureBody?.message || `تعذر قراءة حالة التدفق بعد عدة محاولات (${response.status}).`);
+          }
+          const retryAfterSeconds = Number.parseFloat(response.headers.get("Retry-After") || "0");
+          const retryDelay = retryAfterSeconds > 0 ? retryAfterSeconds * 1000 : delay;
+          await new Promise(resolve => window.setTimeout(resolve, Math.min(retryDelay, 30000)));
+          delay = Math.min(POLL_MAX, Math.floor(delay * 1.5));
+          continue;
+        }
+
+        if (!response.ok) {
+          const failureBody = await readFlowResponse(response);
+          throw new Error(failureBody?.message || `تعذر قراءة حالة التدفق (${response.status}).`);
+        }
+
+        transientFailures = 0;
         const data = await readFlowResponse(response);
         const url = extractDownloadUrl(data);
         if (url) return url;
@@ -513,7 +548,8 @@
           statusUrl = acceptedBody?.statusQueryGetUri || acceptedBody?.properties?.statusQueryGetUri;
         }
         if (!statusUrl) throw new Error("لم يُرجع Microsoft Flow رابط متابعة الطلب.");
-        return pollFlow(statusUrl, service);
+        const retryAfterSeconds = Number.parseFloat(response.headers.get("Retry-After") || "0");
+        return pollFlow(statusUrl, service, retryAfterSeconds * 1000);
       }
       const payload = await readFlowResponse(response);
       if (!response.ok) throw new Error(payload?.message || payload?.error?.message || `خطأ في Microsoft Flow (${response.status}).`);

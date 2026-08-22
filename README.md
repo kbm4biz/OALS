@@ -35,6 +35,8 @@ Add a **Compose** action named `File_path` with this expression (change the fold
 concat('/TraineeSchedules/', string(triggerBody()?['studentId']), '.pdf')
 ```
 
+Add OneDrive for Business **Get file metadata using path** before creating the link. Set its File Path to the output of `File_path`. This gives a clear failure when the PDF does not exist.
+
 Add the current OneDrive for Business **Create share link by path** action:
 
 - File Path: output of `File_path`
@@ -53,6 +55,24 @@ Add a **Response** action:
   "downloadUrl": "PASTE_THE_WEB_URL_DYNAMIC_VALUE_HERE"
 }
 ```
+
+Open the Response action's **Settings** and make sure **Asynchronous response is Off**. This short lookup flow should return `200` directly; asynchronous mode adds a `202` status endpoint and unnecessary polling.
+
+Add a second Response action for errors and use **Configure run after** so it runs when `Get file metadata using path` or `Create share link by path` fails or times out:
+
+- Status code: `404`
+- Header: `Content-Type` = `application/json`
+- Header: `Access-Control-Allow-Origin` = `*`
+- Body:
+
+```json
+{
+  "ok": false,
+  "message": "لم يتم العثور على جدول المتدرب أو تعذر إنشاء رابط المشاركة."
+}
+```
+
+For both OneDrive actions, open **Settings > Retry Policy**, choose exponential retry, and use four retries for transient OneDrive or gateway failures.
 
 Save the flow, copy the generated HTTP POST URL, then replace this placeholder in `index.html`:
 
