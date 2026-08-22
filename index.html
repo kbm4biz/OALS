@@ -102,10 +102,11 @@
     .service-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
     .service-icon { display:grid; width:52px; height:52px; place-items:center; border:1px solid rgba(23,107,175,.12); border-radius:16px; color:var(--blue); background:rgba(38,135,202,.08); }
     .service-icon svg { width:26px; height:26px; }
-    .service-badge { padding:7px 9px; border-radius:999px; color:var(--success); background:rgba(20,133,95,.08); font-size:.62rem; font-weight:700; }
+    .service-badge { padding:7px 9px; border-radius:999px; color:var(--success); background:rgba(20,133,95,.08); font-size:.62rem; font-weight:700; white-space:nowrap; }
     .service-badge.pending { color:var(--warning); background:rgba(182,107,12,.09); }
     .service-card h2 { margin:22px 0 8px; color:var(--ink-deep); font-size:1.08rem; font-weight:700; line-height:1.55; }
     .service-card p { margin:0 0 22px; color:var(--muted); font-size:.76rem; line-height:1.8; }
+    .service-card .service-note { align-self:flex-start; margin:-8px 0 18px; padding:7px 10px; border:1px solid rgba(169,99,11,.16); border-radius:10px; color:var(--warning); background:rgba(169,99,11,.07); font-size:.67rem; font-weight:700; line-height:1.6; }
     .service-action { width:100%; min-height:46px; margin-top:auto; padding:11px 14px; color:#fff; background:var(--ink); font-size:.76rem; font-weight:700; }
     .service-card:nth-child(2) .service-action { background:linear-gradient(135deg,var(--blue),var(--blue-light)); }
     .service-response { display:none; margin-top:22px; padding:22px; border:1px solid var(--line); border-radius:var(--r-lg); background:#f4f8fb; }
@@ -144,8 +145,8 @@
     <main>
       <section id="authView" class="panel auth-layout" aria-labelledby="loginTitle">
         <div class="welcome-pane">
-          <div><p class="eyebrow light">بوابة خدمات المتدرب</p><h1>خدماتك الأكاديمية، في مكان واحد.</h1><p class="lead">سجّل الدخول ببياناتك المعتمدة، ثم اختر الخدمة التي تحتاجها. التحقق ما زال مرتبطاً بسجل المتدربين الحالي.</p></div>
-          <ul class="feature-list"><li><span class="check-dot">✓</span> تحقق موحد باستخدام بيانات المتدرب الحالية</li><li><span class="check-dot">✓</span> وصول سريع إلى الملخص الشامل والجدول التدريبي</li><li><span class="check-dot">✓</span> تصميم متجاوب يعمل على الجوال والحاسب</li></ul>
+          <div><p class="eyebrow light">بوابة خدمات المتدرب</p><h1>خدماتك الأكاديمية، في مكان واحد.</h1><p class="lead">سجّل الدخول ببياناتك المعتمدة، ثم اختر الخدمة التي تحتاجها.</p></div>
+          <ul class="feature-list"><li><span class="check-dot">✓</span> دخول آمن وسهل</li><li><span class="check-dot">✓</span> وصول سريع إلى الملخص الشامل والجدول التدريبي</li><li><span class="check-dot">✓</span> تجربة مريحة على الجوال والحاسب</li></ul>
         </div>
         <div class="form-pane"><div class="form-inner">
           <p class="eyebrow">تسجيل الدخول</p><h2 id="loginTitle">مرحباً بعودتك</h2>
@@ -162,9 +163,9 @@
         <div class="services-head"><div><p class="eyebrow">الخدمات الرقمية</p><h1 id="servicesTitle">ما الخدمة التي تحتاجها اليوم؟</h1><div class="student-chip">تم التحقق · رقم المتدرب <b id="verifiedStudentId"></b></div></div><button id="signOutBtn" class="secondary-btn" type="button">تغيير بيانات الدخول</button></div>
         <div class="service-grid">
           <article class="service-card" id="summaryCard"><div class="service-top"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M8 7h8M8 11h6"/></svg></div><span id="summaryBadge" class="service-badge">متاحة</span></div><h2>الملخص الشامل للمتدرب</h2><p>إنشاء التقرير الحالي الذي يجمع بيانات المتدرب ومخططاته وخطته الشجرية في ملف PDF واحد.</p><button class="service-action" type="button" data-service="summary">إنشاء الملخص الشامل</button></article>
-          <article class="service-card" id="scheduleCard"><div class="service-top"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div><span id="scheduleBadge" class="service-badge">جديدة</span></div><h2>طباعة جدول المتدرب</h2><p>البحث عن ملف الجدول المطابق لرقم المتدرب في OneDrive، ثم تجهيز رابط العرض والطباعة.</p><button class="service-action" type="button" data-service="schedule">عرض الجدول التدريبي</button></article>
+          <article class="service-card" id="scheduleCard"><div class="service-top"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div><span id="scheduleBadge" class="service-badge">متاحة</span></div><h2>طباعة جدول المتدرب</h2><p>اطّلع على جدولك التدريبي واطبعه أو حمّله بسهولة.</p><p class="service-note">الخدمة للمستجدين فقط</p><button class="service-action" type="button" data-service="schedule">عرض الجدول التدريبي</button></article>
         </div>
-        <div id="serviceResponse" class="service-response" aria-live="polite"><h2 id="responseTitle" class="response-title">جاري تنفيذ الخدمة</h2><div id="responseBody"></div></div>
+        <div id="serviceResponse" class="service-response" aria-live="polite"><h2 id="responseTitle" class="response-title">جاري تجهيز طلبك</h2><div id="responseBody"></div></div>
       </section>
     </main>
     <footer class="footer"><span>© 2026 منصة الإرشاد الرقمي</span><span>قسم تقنية الأعمال · الكلية التقنية بحائل بنين</span></footer>
@@ -204,16 +205,16 @@
         resultTitle: "تم إنشاء الملخص بنجاح",
         resultDescription: "أصبح ملف الملخص الشامل جاهزاً للعرض والتحميل.",
         buttonLabel: "فتح ملف الملخص PDF",
-        steps: ["جاري جلب البيانات", "جاري تحليل البيانات", "جاري رسم الخطة الشجرية", "جاري إعداد المخططات البيانية", "الإعداد النهائي للملخص الشامل"]
+        steps: ["جاري تجهيز الملخص الشامل"]
       },
       schedule: {
         enabled: ENABLE_SCHEDULE_SERVICE,
         endpoint: SCHEDULE_FLOW_ENDPOINT,
         title: "طباعة جدول المتدرب",
-        resultTitle: "تم العثور على الجدول",
-        resultDescription: "أصبح جدولك التدريبي جاهزاً للعرض أو الطباعة أو التحميل.",
-        buttonLabel: "فتح وطباعة الجدول PDF",
-        steps: ["جاري الاتصال بخدمة الجداول", "جاري البحث عن ملف رقم المتدرب", "جاري إنشاء رابط الوصول", "تجهيز الجدول للعرض والطباعة"]
+        resultTitle: "جدولك جاهز",
+        resultDescription: "يمكنك الآن فتح جدولك التدريبي وطباعته أو تحميله.",
+        buttonLabel: "فتح الجدول وطباعته",
+        steps: ["جاري تجهيز جدولك التدريبي"]
       }
     };
 
@@ -302,11 +303,11 @@
       const last4 = cleanLast4(last4Raw);
       if (!/^4\d{8}$/.test(studentId)) throw new Error("رقم المتدرب يجب أن يكون 9 أرقام ويبدأ بالرقم 4.");
       if (!/^\d{4}$/.test(last4)) throw new Error("آخر 4 أرقام من الجوال مطلوبة.");
-      if (!isConfiguredEndpoint(VALIDATION_WEBAPP_URL)) throw new Error("لم يتم ضبط رابط خدمة التحقق.");
+      if (!isConfiguredEndpoint(VALIDATION_WEBAPP_URL)) throw new Error("خدمة التحقق غير متاحة حالياً.");
 
       const validationUrl = `${VALIDATION_WEBAPP_URL}?studentId=${encodeURIComponent(studentId)}&last4=${encodeURIComponent(last4)}`;
       const result = await jsonpWithRetry(validationUrl, 2, 12000);
-      if (!result || result.ok !== true) throw new Error(result?.msg || "بيانات التحقق غير صحيحة.");
+      if (!result || result.ok !== true) throw new Error("بيانات التحقق غير صحيحة.");
       return { studentId, last4 };
     }
 
@@ -343,7 +344,7 @@
         totalElement.textContent = "تعذر تحديث التحميلات";
         totalElement.classList.remove("is-retrying", "is-live");
         totalElement.classList.add("is-offline");
-        totalElement.title = "تعذر الوصول إلى خدمة العداد بعد 3 محاولات";
+        totalElement.title = "تعذر تحديث العدد حالياً";
         console.warn("Download total unavailable:", error);
       }
     }
@@ -373,7 +374,7 @@
         card.classList.toggle("is-disabled", !available);
         badge.classList.toggle("pending", !available);
         if (!service.enabled) { badge.textContent = "متوقفة مؤقتاً"; button.textContent = "الخدمة تحت الصيانة"; }
-        else if (!isConfiguredEndpoint(service.endpoint)) { badge.textContent = "بانتظار الربط"; button.textContent = "اربط Microsoft Flow أولاً"; }
+        else if (!isConfiguredEndpoint(service.endpoint)) { badge.textContent = "غير متاحة حالياً"; button.textContent = "الخدمة غير متاحة"; }
       });
     }
 
@@ -410,7 +411,7 @@
     async function ensureLocationData() {
       if (locationData) return locationData;
       const response = await fetch(LOCATION_SHEET_URL);
-      if (!response.ok) throw new Error("فشل تحميل بيانات الموقع.");
+      if (!response.ok) throw new Error("تعذر التحقق من الموقع حالياً.");
       locationData = processLocationCSV(await response.text());
       return locationData;
     }
@@ -503,7 +504,7 @@
           response = await fetch(statusUrl);
         } catch (error) {
           transientFailures += 1;
-          if (transientFailures > 5) throw new Error("انقطع الاتصال بخدمة التدفق بعد عدة محاولات.");
+          if (transientFailures > 5) throw new Error("انقطع الاتصال بالخدمة بعد عدة محاولات.");
           await new Promise(resolve => window.setTimeout(resolve, delay));
           delay = Math.min(POLL_MAX, Math.floor(delay * 1.5));
           continue;
@@ -513,8 +514,7 @@
         if (retryableStatuses.includes(response.status)) {
           transientFailures += 1;
           if (transientFailures > 5) {
-            const failureBody = await readFlowResponse(response);
-            throw new Error(failureBody?.message || `تعذر قراءة حالة التدفق بعد عدة محاولات (${response.status}).`);
+            throw new Error("تعذر إكمال الطلب حالياً. حاول مرة أخرى لاحقاً.");
           }
           const retryAfterSeconds = Number.parseFloat(response.headers.get("Retry-After") || "0");
           const retryDelay = retryAfterSeconds > 0 ? retryAfterSeconds * 1000 : delay;
@@ -524,15 +524,14 @@
         }
 
         if (!response.ok) {
-          const failureBody = await readFlowResponse(response);
-          throw new Error(failureBody?.message || `تعذر قراءة حالة التدفق (${response.status}).`);
+          throw new Error("تعذر إكمال الطلب حالياً. حاول مرة أخرى لاحقاً.");
         }
 
         transientFailures = 0;
         const data = await readFlowResponse(response);
         const url = extractDownloadUrl(data);
         if (url) return url;
-        if (data?.status === "Failed" || data?.status === "Cancelled") throw new Error(data?.error?.message || "فشل Microsoft Flow في تنفيذ الطلب.");
+        if (data?.status === "Failed" || data?.status === "Cancelled") throw new Error("تعذر إكمال الطلب حالياً.");
         await new Promise(resolve => window.setTimeout(resolve, delay));
         delay = Math.min(POLL_MAX, Math.floor(delay * 1.35));
       }
@@ -540,21 +539,29 @@
     }
 
     async function callFlow(service, studentId) {
-      const response = await fetch(service.endpoint, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ studentId }) });
+      let response;
+      try {
+        response = await fetch(service.endpoint, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ studentId }) });
+      } catch {
+        throw new Error("تعذر الاتصال بالخدمة حالياً. حاول مرة أخرى.");
+      }
       if (response.status === 202) {
         let statusUrl = response.headers.get("Location");
         if (!statusUrl) {
           const acceptedBody = await readFlowResponse(response);
           statusUrl = acceptedBody?.statusQueryGetUri || acceptedBody?.properties?.statusQueryGetUri;
         }
-        if (!statusUrl) throw new Error("لم يُرجع Microsoft Flow رابط متابعة الطلب.");
+        if (!statusUrl) throw new Error("تعذر متابعة الطلب حالياً.");
         const retryAfterSeconds = Number.parseFloat(response.headers.get("Retry-After") || "0");
         return pollFlow(statusUrl, service, retryAfterSeconds * 1000);
       }
       const payload = await readFlowResponse(response);
-      if (!response.ok) throw new Error(payload?.message || payload?.error?.message || `خطأ في Microsoft Flow (${response.status}).`);
+      if (!response.ok) {
+        if (response.status === 404) throw new Error("لم يتم العثور على الملف المطلوب.");
+        throw new Error("تعذر إكمال الطلب حالياً. حاول مرة أخرى.");
+      }
       const url = extractDownloadUrl(payload);
-      if (!url) throw new Error("اكتمل التدفق ولكن لم يتم إرجاع رابط الملف.");
+      if (!url) throw new Error("تعذر فتح الملف المطلوب.");
       return url;
     }
 
@@ -574,11 +581,11 @@
       if (!authenticatedStudent) return signOut();
       const service = SERVICES[serviceKey];
       if (!service?.enabled) return showServiceError("هذه الخدمة متوقفة مؤقتاً للصيانة.");
-      if (!isConfiguredEndpoint(service.endpoint)) return showServiceError("لم يتم ربط رابط Microsoft Flow لهذه الخدمة بعد.");
+      if (!isConfiguredEndpoint(service.endpoint)) return showServiceError("هذه الخدمة غير متاحة حالياً.");
 
       document.querySelectorAll(".service-action").forEach(button => { button.disabled = true; });
       elements.serviceResponse.style.display = "block";
-      elements.responseTitle.textContent = `جاري تنفيذ: ${service.title}`;
+      elements.responseTitle.textContent = `جاري تجهيز ${service.title}`;
       activeProgress = startProgress(service.steps);
       elements.serviceResponse.scrollIntoView({ behavior:"smooth", block:"nearest" });
       try {
