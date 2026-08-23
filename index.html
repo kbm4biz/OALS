@@ -178,8 +178,7 @@
     const ENABLE_BANNER = true;
     const NEWS_BANNER_FALLBACK = "";
 
-    // الحالة الحالية للخدمة الأصلية محفوظة كما كانت في آخر نسخة منشورة.
-    const ENABLE_SUMMARY_SERVICE = false;
+    const ENABLE_SUMMARY_SERVICE = true;
     const ENABLE_SCHEDULE_SERVICE = true;
     const ENABLE_GPS_VERIFY = false;
 
@@ -593,7 +592,7 @@
         const downloadUrl = await callFlow(service, authenticatedStudent.studentId);
         activeProgress.complete();
         showResult(service, downloadUrl);
-        if (serviceKey === "summary") incrementDownloadCount(authenticatedStudent.studentId);
+        incrementDownloadCount(authenticatedStudent.studentId);
       } catch (error) {
         activeProgress.stop();
         showServiceError(error.message || "حدث خطأ غير متوقع.");

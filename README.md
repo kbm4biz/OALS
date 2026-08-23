@@ -4,8 +4,8 @@ Static Arabic RTL student-services portal hosted with GitHub Pages.
 
 ## Current services
 
-- Comprehensive trainee summary: existing Google Sheets validation, GPS option, Microsoft Flow endpoint, polling, and download counter are retained. Its production maintenance switch remains off.
-- Print trainee schedule: uses the same sign-in validation, then calls a separate Microsoft Power Automate flow and displays the returned public PDF link.
+- Comprehensive trainee summary: existing Google Sheets validation, GPS option, Microsoft Flow endpoint, polling, and shared download counter are retained and the service is enabled.
+- Print trainee schedule: uses the same sign-in validation, then calls a separate Microsoft Power Automate flow, displays the returned public PDF link, and increments the same download counter.
 
 ## Connect the schedule flow
 
@@ -85,12 +85,12 @@ The service card activates automatically when the value begins with `https://`.
 ## Operational flags
 
 ```js
-const ENABLE_SUMMARY_SERVICE = false;
+const ENABLE_SUMMARY_SERVICE = true;
 const ENABLE_SCHEDULE_SERVICE = true;
 const ENABLE_GPS_VERIFY = false;
 ```
 
-Set `ENABLE_SUMMARY_SERVICE` to `true` only when the existing summary service should be taken out of maintenance.
+Set either service flag to `false` only when that service needs to be placed in maintenance mode.
 
 ## Expected schedule-flow contract
 
